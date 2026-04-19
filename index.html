@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico de Negocio — Sistema Inteligente</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #18181f;
+    --border: #2a2a35;
+    --accent: #7c6af7;
+    --accent2: #f7c56a;
+    --danger: #f76a6a;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+    linear-gradient(rgba(124,106,247,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,106,247,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    padding: 48px 0 32px;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(124,106,247,0.12);
+    border: 1px solid rgba(124,106,247,0.3);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+
+  h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 40px 0 32px;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 100px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .step-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 100px;
+    background: var(--border);
+    transition: all 0.3s ease;
+  }
+
+  .dot.active {
+    width: 24px;
+    background: var(--accent);
+  }
+
+  .dot.done {
+    background: rgba(124,106,247,0.4);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124,106,247,0.4), transparent);
+  }
+
+  .step-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .step-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(124,106,247,0.12);
+    border: 1px solid rgba(124,106,247,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .step-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .step-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .field {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  label .hint {
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  label .example {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  label .example::before {
+    content: 'Ej: ';
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  input, textarea, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(124,106,247,0.12);
+  }
+
+  textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b80' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .check-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .check-item input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--accent);
+    padding: 0;
+    margin: 0;
+  }
+
+  .check-item:has(input:checked) {
+    border-color: var(--accent);
+    background: rgba(124,106,247,0.08);
+    color: var(--accent);
+  }
+
+  .range-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  input[type="range"] {
+    flex: 1;
+    height: 4px;
+    padding: 0;
+    accent-color: var(--accent);
+    background: var(--border);
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+  }
+
+  .range-val {
+    min-width: 32px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    background: rgba(247,106,106,0.12);
+    border: 1px solid rgba(247,106,106,0.2);
+    color: var(--danger);
+    margin: 3px;
+  }
+
+  .flag.warn {
+    background: rgba(247,197,106,0.12);
+    border-color: rgba(247,197,106,0.2);
+    color: var(--accent2);
+  }
+
+  .nav-btns {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .btn-primary:hover { background: #9080ff; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .btn-secondary:hover { border-color: var(--accent); color: var(--text); }
+
+  .btn:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 24px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .loading-sub {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .result-section { display: none; }
+  .result-section.visible { display: block; }
+
+  .result-header {
+    text-align: center;
+    padding: 32px 0;
+  }
+
+  .result-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .nodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .node-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .node-card:hover { border-color: var(--accent); }
+
+  .node-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .node-subs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .sub-tag {
+    font-size: 11px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    color: var(--muted);
+  }
+
+  .problems-section {
+    background: rgba(247,106,106,0.06);
+    border: 1px solid rgba(247,106,106,0.15);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 16px 0;
+  }
+
+  .problems-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--danger);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .json-block {
+    background: #0d0d14;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #a8b5cf;
+    overflow-x: auto;
+    line-height: 1.7;
+    max-height: 280px;
+    overflow-y: auto;
+    white-space: pre;
+  }
+
+  .raci-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+
+  .raci-table th, .raci-table td {
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    text-align: left;
+  }
+
+  .raci-table th {
+    background: var(--surface2);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+
+  .raci-table td:first-child {
+    font-weight: 600;
+  }
+
+  .raci-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .raci-r { background: #d4f7e5; color: #1a5f3c; }
+  .raci-a { background: #fde8e8; color: #7a1a1a; }
+  .raci-c { background: #fef3cd; color: #5c4a1a; }
+  .raci-i { background: #e8e8ff; color: #3a1a5f; }
+
+  .roadmap-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+  }
+
+  .roadmap-num {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .roadmap-content h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .roadmap-content p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .step { display: none; }
+  .step.active { display: block; }
+
+  .step.active { animation: fadeUp 0.3s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    font-size: 13px;
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 600px) {
+    .card { padding: 24px 20px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="badge">⚡ Powered by IA</div>
+    <h1>Diagnóstico<br><span>Inteligente</span> de Negocio</h1>
+    <p class="subtitle">Respondé las preguntas. La IA mapea tu operación, detecta problemas y te da un plan de acción.</p>
+  </header>
+
+  <div id="wizard">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:12.5%"></div></div>
+      <span class="progress-label" id="progressLabel">Paso 1 de 8</span>
+    </div>
+
+    <div class="step-dots" id="stepDots"></div>
+
+    <!-- STEP 1: Contexto -->
+    <div class="step active" id="step-1">
+      <div class="card">
+        <div class="step-header">
+          <div class="step-icon">🏢</div>
+          <div>
+            <div class="step-title">Contexto del negocio</div>
+            <div class="step-desc">Entendemos la base antes de mapear el sistema.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>¿A qué se dedica tu negocio? <span class="hint">(descripción breve)</span></label>
+          <textarea id="f_descripcion" placeholder="Ej: Somos una empresa que vende materiales de construcción a constructoras y remodeladores. Tenemos un local y entregamos nosotros mismos." rows="3"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Tipo de negocio</label>
+            <select id="f_tipo">
+              <option value="">Seleccioná...</option>
+              <option>Servicio profesional</option>
+              <option>Comercio / Retail</option>
+              <option>Producción / Manufactura</option>
+              <option>Tecnología / SaaS</option>
+              <option>Inmobiliaria</option>
+              <option>Educación</option>
+              <option>Salud / Bienestar</option>
+              <option>Gastronomía</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>🚹 ¿Cuántas personas trabajan?</label>
+            <div class="range-wrap">
+              <input type="range" id="f_equipo" min="1" max="50" value="3" oninput="document.getElementById('equipo_val').textContent=this.value">
+              <span class="range-val" id="equipo_val">3</span>
+            </div>
+            <span class="example">contando vos, socios, empleados, etc.</span>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>📍 ¿Tienen sucursales?</label>
+            <select id="f_sucursales">
+              <option value="no">No, todo en un solo lugar</option>
+              <option value="si">Sí, más de una sede</option>
+              <option value="virtual">Trabajo remoto / virtual</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>🎯 ¿Quién decide las cosas importantes?</label>
+            <select id="f_decision">
+              <option value="duenio">Solo el dueño / socio</option>
+              <option value="gerente">Un gerente o socio designado</option>
+              <option value="equipo">Entre todos</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>⭐ ¿Cuál es el objetivo principal para los próximos 12 meses?</label>
+          <select id="f_objetivo">
+            <option value="">Seleccioná el más importante...</option>
+            <option>Aumentar ventas y clientes</option>
+            <option>Ordenar el negocio (sacar al老板 del día a día)</option>
+            <option>Escalar sin contratar más gente</option>
+            <option>Lanzar un producto o servicio nuevo</option>
+            <option>Reducir costos y mejorar ganancia</option>
+            <option>Preparar el negocio para venderlo</option>
+          </select>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="nextStep(1)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Marketing -->
+    <div class="step" id="step-2">
+      <div class="card">
+        <div class="step-header">
+          <div class="step-icon">📣</div>
+          <div>
+            <div class="step-title">Marketing — ¿Cómo te conocen?</div>
+            <div class="step-desc">¿De dónde vienen los clientes nuevos?</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>¿Por dónde llegan los clientes? <span class="hint">(marcá todos los que aplique)</span></label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="canal" value="Instagram/Facebook"> Instagram/Facebook</label>
+            <label class="check-item"><input type="checkbox" name="canal" value="Google/búsqueda"> Google (búsqueda)</label>
+            <label class="check-item"><input type="checkbox" name="canal" value="Google Ads"> Pasan publicidad en Google</label>
+            <label class="check-item"><input type="checkbox" name="canal" value="Referidos"> Clients anteriores te mandan otros</label>
+            <label class="check-item"><input type="checkbox" name="canal" value="LinkedIn"> LinkedIn</label>
+            <label class="check-item"><input type="checkbox" name="canal" value="Boca en boca"> Boca en boca / pasan la voz</label>
+            <label class="check-item"><input type="checkbox" name="canal" value="Web propia"> Visitan tu web</label>
+            <label class="check-item"><input type="checkbox" name="canal" value="No sé"> No sé / no mido</label>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>💰 ¿Hacen publicidad paga?</label>
+            <select id="f_campanas">
+              <option value="no">No</option>
+              <option value="si_propias">Sí, nosotros mismos</option>
+              <option value="si_agencia">Sí, con una agencia</option>
+              <option value="esporadico">A veces, cuando hay plata</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>📒 ¿Usan algún sistema para seguir clientes?</label>
+            <select id="f_crm">
+              <option value="no">No, nada formal</option>
+              <option value="excel">Excel o Google Sheets</option>
+              <option value="crm_basico">CRM básico (HubSpot free, etc)</option>
+              <option value="crm_avanzado">CRM pago</option>
+              <option value="whatsapp">Solo WhatsApp</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>📱 Cuando un cliente potencial te contacta, ¿cómo lo hace?</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="contacto" value="WhatsApp"> WhatsApp</label>
+            <label class="check-item"><input type="checkbox" name="contacto" value="Email"> Email</label>
+            <label class="check-item"><input type="checkbox" name="contacto" value="Llamada"> Llamada telefónica</label>
+            <label class="check-item"><input type="checkbox" name="contacto" value="DM redes"> Mensaje directo en redes</label>
+            <label class="check-item"><input type="checkbox" name="contacto" value="Formulario web"> Formulario en web</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>📊 ¿Cuántos leads nuevos por mes?</label>
+          <select id="f_leads">
+            <option value="1-5">Entre 1 y 5</option>
+            <option value="5-20">Entre 5 y 20</option>
+            <option value="20-50">Entre 20 y 50</option>
+            <option value="50-100">Entre 50 y 100</option>
+            <option value="+100">Más de 100</option>
+            <option value="no_se">No tengo idea</option>
+          </select>
+          <span class="example">un lead = alguien que te consultó pero todavía no te pagó</span>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="prevStep(2)">← Atrás</button>
+        <button class="btn btn-primary" onclick="nextStep(2)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Ventas -->
+    <div class="step" id="step-3">
+      <div class="card">
+        <div class="step-header">
+          <div class="step-icon">💼</div>
+          <div>
+            <div class="step-title">Ventas — Del interés a la venta</div>
+            <div class="step-desc">¿Qué pasa desde que alguien consulta hasta que pagas?</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>👤 ¿Quién responde las consultas de clientes?</label>
+            <select id="f_quien_responde">
+              <option value="duenio">El dueño / socio</option>
+              <option value="vendedor">Un vendedor dedicado</option>
+              <option value="varios">Varias personas (sin tono fijo)</option>
+              <option value="asistente">Una asistente / recepción</option>
+            </select>
+            <span class="example">nombre del rol, no de la persona</span>
+          </div>
+          <div class="field">
+            <label>📋 ¿Tienen un proceso de venta paso a paso?</label>
+            <select id="f_proceso_venta">
+              <option value="no">No, cada uno hace lo que quiere</option>
+              <option value="informal">Tenemos idea pero no está escrito</option>
+              <option value="semi">Medio escrito, medio improvisation</option>
+              <option value="si">Sí, documentado y lo cumplimos</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>🔄 ¿Qué pasa cuando un lead no contesta? ¿Lo siguen?</label>
+          <select id="f_seguimiento">
+            <option value="no">No, si no contesta se pierde</option>
+            <option value="manual_aveces">A veces,取决于 cuándo nos acordamos</option>
+            <option value="manual_siempre">Sí, siempre lo intentamos</option>
+            <option value="automatico">Tenemos automate que sigue solo</option>
+          </select>
+          <span class="example">"le mandé wasap pero no respondió" → eso se pierde?</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>💵 ¿Cómo le mandan el presupuesto o cotización?</label>
+            <select id="f_presupuesto">
+              <option value="whatsapp">Por WhatsApp</option>
+              <option value="email">Por email (PDF o manual)</option>
+              <option value="sistema">Por un sistema/plataforma</option>
+              <option value="verbal"> Verbal / Llamada</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>⏱️ ¿Cuánto tarda en promedio de la primera consulta hasta que paga?</label>
+            <select id="f_tiempo_cierre">
+              <option value="dia">El mismo día</option>
+              <option value="semana">Menos de 1 semana</option>
+              <option value="quincena">Entre 1 y 2 semanas</option>
+              <option value="mes">Entre 1 y 3 meses</option>
+              <option value="mas">Más de 3 meses</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>💲 ¿Cuánto es el ticket promedio por cliente?</label>
+            <select id="f_ticket">
+              <option value="<100">Menos de $100</option>
+              <option value="100-500">$100 – $500</option>
+              <option value="500-2000">$500 – $2.000</option>
+              <option value="2000-10000">$2.000 – $10.000</option>
+              <option value="+10000">Más de $10.000</option>
+              <option value="no_se">No tengo idea</option>
+            </select>
+            <span class="example">en dollars, si es servicio u$s precio por proyecto</span>
+          </div>
+          <div class="field">
+            <label>📈 ¿De los que consultan, cuántos terminan comprando?</label>
+            <select id="f_conversion">
+              <option value="<10">Menos del 10%</option>
+              <option value="10-30">Entre 10% y 30%</option>
+              <option value="30-60">Entre 30% y 60%</option>
+              <option value=">60">Más del 60%</option>
+              <option value="no_se">No lo tengo medido</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="prevStep(3)">← Atrás</button>
+        <button class="btn btn-primary" onclick="nextStep(3)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Operaciones -->
+    <div class="step" id="step-4">
+      <div class="card">
+        <div class="step-header">
+          <div class="step-icon">⚙️</div>
+          <div>
+            <div class="step-title">Operaciones — Entregar el trabajo</div>
+            <div class="step-desc">Después de que paga, ¿qué pasa hasta que entregás?</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>📝 Describí en 2-3 oraciones qué pasa DESPUÉS de que alguien te paga</label>
+          <textarea id="f_operacion" placeholder="Ej: Le enviamos el contrato por mail, lo打印 y entrega en persona, coordinamos fecha de inicio, nuestro técnico va a hacer el trabajo, terminamos, el cliente inspecciona y firma.ok, luego facturamos y cobramos." rows="4"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>👷 ¿Quién hace el trabajo físico/entrega?</label>
+            <select id="f_ejecutor">
+              <option value="duenio">El dueño / socio</option>
+              <option value="equipo_fijo">Empleados fijos en-nómina</option>
+              <option value="freelancers">Freelancers o terceros</option>
+              <option value="mixto">Mezcla de empleados + externos</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>📚 ¿Tienen los procesos documentados (manual, SOP)?</label>
+            <select id="f_documentado">
+              <option value="no">No, todo está en la cabeza de c/u</option>
+              <option value="parcial">Parcialmente, algunos</option>
+              <option value="si_informal">Sí, pero informales / desactualizados</option>
+              <option value="si_formal">Sí, con manuales claros</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>⚠️ ¿En qué suelen having problemas? <span class="hint">(marcá todos)</span></label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="errores" value="Coordinación"> Coordinación entre personas</label>
+            <label class="check-item"><input type="checkbox" name="errores" value="Calidad"> Calidad del resultado</label>
+            <label class="check-item"><input type="checkbox" name="errores" value="Tiempos"> Tiempos de entrega</label>
+            <label class="check-item"><input type="checkbox" name="errores" value="Com-cliente"> Comunicación con el cliente</label>
+            <label class="check-item"><input type="checkbox" name="errores" value="Materiales"> Materiales o insumos</label>
+            <label class="check-item"><input type="checkbox" name="errores" value="Cobranza"> Cobranza / facturación</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>📅 ¿La demanda es estable todo el año?</label>
+          <select id="f_estacional">
+            <option value="no">Sí, fairly estable</option>
+            <option value="si_leve">Sí, varía un poco</option>
+            <option value="si_fuerte">No, hay picos muy marcados</option>
+          </select>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="prevStep(4)">← Atrás</button>
+        <button class="btn btn-primary" onclick="nextStep(4)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Postventa -->
+    <div class="step" id="step-5">
+      <div class="card">
+        <div class="step-header">
+          <div class="step-icon">🔁</div>
+          <div>
+            <div class="step-title">Postventa — El cliente vuelve</div>
+            <div class="step-desc">Después de entregado, ¿qué pasa?</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>📞 ¿Llaman o escriben después de entregar?</label>
+            <select id="f_postventa">
+              <option value="no">No, se fueron y no sabemos más</option>
+              <option value="aveces">A veces, depende el caso</option>
+              <option value="si">Sí, siempre tenemos contacto</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>⭐ ¿Piden opiniones o reviews?</label>
+            <select id="f_feedback">
+              <option value="no">No</option>
+              <option value="verbal">Sí, verbalmente</option>
+              <option value="encuesta">Sí, mandamos encuesta</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>🔄 ¿Los clientes vuelven a comprar?</label>
+            <select id="f_recompra">
+              <option value="no">No aplica / No vuelven</option>
+              <option value="pocas">Pocas veces</option>
+              <option value="si">Sí, bastante</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>🎁 ¿Tienen programa de referidos o fidelización?</label>
+            <select id="f_fidelizacion">
+              <option value="no">No</option>
+              <option value="informal"> Informal (sin sistema)</option>
+              <option value="si">Sí, structured</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="prevStep(5)">← Atrás</button>
+        <button class="btn btn-primary" onclick="nextStep(5)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: Administración -->
+    <div class="step" id="step-6">
+      <div class="card">
+        <div class="step-header">
+          <div class="step-icon">📊</div>
+          <div>
+            <div class="step-title">Administración y Finanzas</div>
+            <div class="step-desc">Plata, números y control.</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>💰 ¿Cómo registran ingresos y gastos?</label>
+            <select id="f_finanzas">
+              <option value="nada">No registramos formalmente</option>
+              <option value="excel">Excel o Google Sheets</option>
+              <option value="software">Software contable (facturación)</option>
+              <option value="contador">Un contador externo</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>🏦 ¿Quién controla la plata (caja, facturación)?</label>
+            <select id="f_caja">
+              <option value="duenio">El dueño</option>
+              <option value="admin">Un administrador dedicado</option>
+              <option value="contador">El contador</option>
+              <option value="nadie">Nadie de forma sistemática</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>📈 ¿Tienen reportes mensuales?</label>
+            <select id="f_reportes">
+              <option value="no">No</option>
+              <option value="basico">Básico, cuando el contador lo hace</option>
+              <option value="si">Sí, todos los meses</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>🏠 ¿Separan finanzas del negocio de las personales?</label>
+            <select id="f_separacion">
+              <option value="no">No, todo mezclado</option>
+              <option value="parcial">Parcialmente</option>
+              <option value="si">Sí, todo separado</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="prevStep(6)">← Atrás</button>
+        <button class="btn btn-primary" onclick="nextStep(6)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 7: Tecnología -->
+    <div class="step" id="step-7">
+      <div class="card">
+        <div class="step-header">
+          <div class="step-icon">🔧</div>
+          <div>
+            <div class="step-title">Tecnología y herramientas</div>
+            <div class="step-desc">¿Con qué trabajan hoy?</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>🛠️ ¿Qué herramientas usan actualmente? <span class="hint">(marcá todos)</span></label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="tools" value="WhatsApp"> WhatsApp</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="Excel"> Excel / Sheets</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="Email"> Email / Gmail</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="Notion"> Notion</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="Trello"> Trello / Asana</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="Instagram"> Instagram</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="Facturación"> Sistema de facturación</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="CRM"> CRM dedicado</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>⏰ ¿Cuántas horas por semana dedican a tareas repetitivas manuelle?</label>
+          <select id="f_manual">
+            <option value="pocas">Pocas (1-5 hs/semana)</option>
+            <option value="moderado">Moderado (5-15 hs/semana)</option>
+            <option value="mucho">Mucho (más de 15 hs/semana)</option>
+          </select>
+          <span class="example">copiar y pegar, mover archivos, responder lo mismo, etc.</span>
+        </div>
+
+        <div class="field">
+          <label>💻 ¿Cómo está el equipo con la tecnología?</label>
+          <select id="f_tech_level">
+            <option value="bajo">Flojo, les cuesta adoptar cosas nuevas</option>
+            <option value="medio">Regular, aprenden con ayuda</option>
+            <option value="alto">Bien, aprenden rápido</option>
+          </select>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="prevStep(7)">← Atrás</button>
+        <button class="btn btn-primary" onclick="nextStep(7)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 8: Problemas -->
+    <div class="step" id="step-8">
+      <div class="card">
+        <div class="step-header">
+          <div class="step-icon">⚠️</div>
+          <div>
+            <div class="step-title">Puntos de dolor — Lo más importante</div>
+            <div class="step-desc">Sé honesto, esto ayuda a encontrar solutions.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>💸 ¿Dónde sentís que perdés plata? <span class="hint">(marcá todos los que apliquen)</span></label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="pierde_plata" value="Leads que no cierran"> Leads que consultan pero no cierran</label>
+            <label class="check-item"><input type="checkbox" name="pierde_plata" value="Clientes que no vuelven"> Clientes que no vuelven</label>
+            <label class="check-item"><input type="checkbox" name="pierde_plata" value="Tiempo operativo"> Tiempo del dueño en tareas operativas</label>
+            <label class="check-item"><input type="checkbox" name="pierde_plata" value="Errores"> Errores y retrabajos</label>
+            <label class="check-item"><input type="checkbox" name="pierde_plata" value="Cobranza"> No cobró a tiempo</label>
+            <label class="check-item"><input type="checkbox" name="pierde_plata" value="Costos"> Costos que no controla</label>
+            <label class="check-item"><input type="checkbox" name="pierde_plata" value="Dependencia"> Dependencia de personas clave</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>🔥 Describí en 2-3 oraciones la parte más caótica del negocio</label>
+          <textarea id="f_caotico" placeholder="Ej: Cuando entran muchos clientes a la vez, nadie sabe quién hace qué. El dueño termina haciendo todo y siempre le echa la culpa a los otros cuando algo falla. No hay quién mande." rows="3"></textarea>
+        </div>
+
+        <div class="field">
+          <label>🎯 Si pudieras resolver algo mañana, ¿qué sería?</label>
+          <textarea id="f_resolver" placeholder="Ej: Que los leads no se pierdan. Que mi equipo sepa qué hacer sin que yo tenga que estar ahí. Poder ir de vacaciones sin que todo se caiga." rows="3"></textarea>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="prevStep(8)">← Atrás</button>
+        <button class="btn btn-primary" onclick="generateDiagnosis()" id="generateBtn">
+          🧠 Generar diagnóstico
+        </button>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div id="loadingState" style="display:none">
+      <div class="card">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <div class="loading-text">Analizando tu negocio...</div>
+          <div class="loading-sub">La IA está generando el mapa de procesos, detectando problemas y creando el plan de acción.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="resultSection" class="result-section">
+    <div class="result-header">
+      <div class="badge">✅ Diagnóstico completo</div>
+      <div class="result-title">Tu Plan de Acción</div>
+    </div>
+
+    <!-- Resumen Ejecutivo -->
+    <div class="card">
+      <div class="step-header">
+        <div class="step-icon">🧠</div>
+        <div><div class="step-title">Análisis Ejecutivo</div></div>
+      </div>
+      <div class="diagnose-summary" id="diagnoseSummary"></div>
+    </div>
+
+    <!-- Mapa de Nodos -->
+    <div class="card">
+      <div class="step-header">
+        <div class="step-icon">🗺���</div>
+        <div><div class="step-title">Mapa de Procesos</div></div>
+      </div>
+      <div class="nodes-grid" id="nodesGrid"></div>
+    </div>
+
+    <!-- Pasos por Nodo -->
+    <div class="card">
+      <div class="step-header">
+        <div class="step-icon">📋</div>
+        <div><div class="step-title">Flujo Detallado por Proceso</div></div>
+      </div>
+      <div id="flujoDetallado"></div>
+    </div>
+
+    <!-- Matriz RACI -->
+    <div class="card">
+      <div class="step-header">
+        <div class="step-icon">👥</div>
+        <div><div class="step-title">Matriz de Responsabilidades (RACI)</div></div>
+      </div>
+      <table class="raci-table" id="raciTable">
+        <thead>
+          <tr>
+            <th>Proceso</th>
+            <th>R (Hace)</th>
+            <th>A (Aprueba)</th>
+            <th>C (Consulta)</th>
+            <th>I (Info)</th>
+          </tr>
+        </thead>
+        <tbody id="raciBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Roadmap -->
+    <div class="card">
+      <div class="step-header">
+        <div class="step-icon">🚀</div>
+        <div><div class="step-title"> Roadmap de Implementación</div></div>
+      </div>
+      <div id="roadmap"></div>
+    </div>
+
+    <!-- Problemas -->
+    <div class="card">
+      <div class="step-header">
+        <div class="step-icon">🚨</div>
+        <div><div class="step-title">Problemas Detectados</div></div>
+      </div>
+      <div id="problemsList"></div>
+    </div>
+
+    <!-- JSON -->
+    <div class="card">
+      <div class="step-header">
+        <div class="step-icon">📄</div>
+        <div><div class="step-title">JSON (para guardar)</div></div>
+      </div>
+      <div class="json-block" id="jsonBlock"></div>
+      <button class="btn btn-secondary" onclick="copyJSON()" style="width:100%;margin-top:12px">📋 Copiar JSON</button>
+    </div>
+  </div>
+
+  <div style="height:60px"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// CONFIGURACIÓN - API KEY DE GROQ
+const GROQ_API_KEY = "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";
+
+let currentStep = 1;
+const totalSteps = 8;
+let diagnosisData = null;
+
+function initDots() {
+  const container = document.getElementById('stepDots');
+  container.innerHTML = '';
+  for (let i = 1; i <= totalSteps; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 1 ? ' active' : '');
+    dot.id = 'dot-' + i;
+    container.appendChild(dot);
+  }
+}
+
+function updateProgress() {
+  const pct = (currentStep / totalSteps) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Paso ${currentStep} de ${totalSteps}`;
+  for (let i = 1; i <= totalSteps; i++) {
+    const dot = document.getElementById('dot-' + i);
+    dot.className = 'dot' + (i === currentStep ? ' active' : i < currentStep ? ' done' : '');
+  }
+}
+
+function nextStep(from) {
+  document.getElementById('step-' + from).classList.remove('active');
+  currentStep = from + 1;
+  document.getElementById('step-' + currentStep).classList.add('active');
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function prevStep(from) {
+  document.getElementById('step-' + from).classList.remove('active');
+  currentStep = from - 1;
+  document.getElementById('step-' + currentStep).classList.add('active');
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function getChecked(name) {
+  return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(el => el.value);
+}
+
+function collectData() {
+  return {
+    contexto: {
+      descripcion: document.getElementById('f_descripcion').value,
+      tipo: document.getElementById('f_tipo').value,
+      equipo: document.getElementById('f_equipo').value,
+      sucursales: document.getElementById('f_sucursales').value,
+      decision: document.getElementById('f_decision').value,
+      objetivo_12m: document.getElementById('f_objetivo').value,
+    },
+    marketing: {
+      canales: getChecked('canal'),
+      campanas: document.getElementById('f_campanas').value,
+      crm: document.getElementById('f_crm').value,
+      contacto: getChecked('contacto'),
+      leads_mes: document.getElementById('f_leads').value,
+    },
+    ventas: {
+      quien_responde: document.getElementById('f_quien_responde').value,
+      proceso: document.getElementById('f_proceso_venta').value,
+      seguimiento: document.getElementById('f_seguimiento').value,
+      presupuesto: document.getElementById('f_presupuesto').value,
+      tiempo_cierre: document.getElementById('f_tiempo_cierre').value,
+      ticket: document.getElementById('f_ticket').value,
+      conversion: document.getElementById('f_conversion').value,
+    },
+    operaciones: {
+      descripcion: document.getElementById('f_operacion').value,
+      ejecutor: document.getElementById('f_ejecutor').value,
+      documentado: document.getElementById('f_documentado').value,
+      errores: getChecked('errores'),
+      estacional: document.getElementById('f_estacional').value,
+    },
+    postventa: {
+      seguimiento: document.getElementById('f_postventa').value,
+      feedback: document.getElementById('f_feedback').value,
+      recompra: document.getElementById('f_recompra').value,
+      fidelizacion: document.getElementById('f_fidelizacion').value,
+    },
+    administracion: {
+      finanzas: document.getElementById('f_finanzas').value,
+      caja: document.getElementById('f_caja').value,
+      reportes: document.getElementById('f_reportes').value,
+      separacion: document.getElementById('f_separacion').value,
+    },
+    tecnologia: {
+      herramientas: getChecked('tools'),
+      manual: document.getElementById('f_manual').value,
+      nivel_tech: document.getElementById('f_tech_level').value,
+    },
+    problemas: {
+      pierde_plata: getChecked('pierde_plata'),
+      caotico: document.getElementById('f_caotico').value,
+      resolver: document.getElementById('f_resolver').value,
+    }
+  };
+}
+
+async function generateDiagnosis() {
+  const data = collectData();
+  document.getElementById('step-8').classList.remove('active');
+  document.getElementById('loadingState').style.display = 'block';
+
+  try {
+    const prompt = `Sos un consultor senior de negocios. Analizá estos datos y generá un diagnóstico completo.
+
+DATOS DEL NEGOCIO:
+${JSON.stringify(data, null, 2)}
+
+Respondé ÚNICAMENTE con JSON válido (sin texto antes o después, sin markdown):
+{
+  "negocio": {
+    "tipo": "string",
+    "equipo": number,
+    "objetivo_12m": "string"
+  },
+  "resumen_ejecutivo": "3-4 oraciones directas sobre el estado actual del negocio. Qué funciona, qué no, y qué priority.",
+  "nodos": [
+    {
+      "nombre": "string (Marketing, Ventas, Operaciones, Postventa, Admin, Sistemas)",
+      "emoji": "string",
+      "estado": "ok|riesgo|critico",
+      "subprocesos": ["string"],
+      "pasos": ["string - paso a paso detalle"],
+      "problemas": ["string - problema específico"]
+    }
+  ],
+  "raci": [
+    {
+      "proceso": "string",
+      "R": "Responsable (rol genérico)",
+      "A": "Aprobador (rol)",
+      "C": "Consulta (rol)",
+      "I": "Informado (rol)"
+    }
+  ],
+  "roadmap": [
+    {"fase": "string", "accion": "string", "tiempo": "string", "impacto": "alto|medio|bajo"}
+  ],
+  "problemas": [
+    {
+      "titulo": "string",
+      "descripcion": "string breve",
+      "prioridad": "alta|media|baja",
+      "tipo": "dinero|tiempo|escala|control",
+      "solucion": "string - sugerencia concreta"
+    }
+  ],
+  "quick_wins": ["string - acciones en menos de 30 días"],
+  "flags": ["string - alertas importantes"]
+}
+
+Reglas:
+- nodos:incluir Marketing, Ventas, Operaciones, Postventa, Administración, Sistemas
+- cada nodo debe tener "pasos" detallados (el flujo real)
+- problemas deben ser concretos y accionables
+- roadmap priorizado por impacto
+- quick_wins son acciones simples en menos de 30 días`;
+
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + GROQ_API_KEY
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 4000,
+        temperature: 0.3
+      })
+    });
+
+    const result = await response.json();
+    let raw = result.choices[0].message.content;
+    raw = raw.replace(/```json|```/g, '').trim();
+
+    diagnosisData = JSON.parse(raw);
+    renderResult(diagnosisData, data);
+
+  } catch (err) {
+    alert("Error: " + err.message);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('step-8').classList.add('active');
+  }
+}
+
+function renderResult(diag, rawData) {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('wizard').style.display = 'none';
+
+  // Resumen Ejecutivo
+  document.getElementById('diagnoseSummary').textContent = diag.resumen_ejecutivo;
+
+  // Nodos
+  const nodesGrid = document.getElementById('nodesGrid');
+  nodesGrid.innerHTML = '';
+  diag.nodos.forEach(node => {
+    const color = node.estado === 'critico' ? '#f76a6a' : node.estado === 'riesgo' ? '#f7c56a' : '#6af7a8';
+    const card = document.createElement('div');
+    card.className = 'node-card';
+    card.innerHTML = `
+      <div class="node-name">
+        <span>${node.emoji || '●'}</span>
+        <span>${node.nombre}</span>
+        <span style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>
+      </div>
+      <div class="node-subs">
+        ${(node.subprocesos || []).map(s => `<span class="sub-tag">${s}</span>`).join('')}
+      </div>`;
+    nodesGrid.appendChild(card);
+  });
+
+  // Flujo Detallado
+  const flujoDiv = document.getElementById('flujoDetallado');
+  flujoDiv.innerHTML = '';
+  diag.nodos.forEach(node => {
+    if (node.pasos && node.pasos.length) {
+      const section = document.createElement('div');
+      section.style.marginBottom = '20px';
+      section.innerHTML = `
+        <div style="font-weight:700;font-size:14px;margin-bottom:8px">${node.emoji} ${node.nombre}</div>
+        <ol style="font-size:13px;line-height:1.8;padding-left:20px;color:var(--muted)">
+          ${node.pasos.map(p => `<li style="margin-bottom:4px">${p}</li>`).join('')}
+        </ol>`;
+      flujoDiv.appendChild(section);
+    }
+  });
+
+  // RACI
+  const raciBody = document.getElementById('raciBody');
+  raciBody.innerHTML = '';
+  (diag.raci || []).forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${r.proceso}</td>
+      <td><span class="raci-tag raci-r">${r.R || '-'}</span></td>
+      <td><span class="raci-tag raci-a">${r.A || '-'}</span></td>
+      <td><span class="raci-tag raci-c">${r.C || '-'}</span></td>
+      <td><span class="raci-tag raci-i">${r.I || '-'}</span></td>
+    `;
+    raciBody.appendChild(tr);
+  });
+
+  // Roadmap
+  const roadmapDiv = document.getElementById('roadmap');
+  roadmapDiv.innerHTML = '';
+  (diag.roadmap || []).forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'roadmap-item';
+    div.innerHTML = `
+      <div class="roadmap-num">${i + 1}</div>
+      <div class="roadmap-content">
+        <h4>${item.fase}</h4>
+        <p>${item.accion}</p>
+        <div style="font-size:11px;margin-top:4px;color:var(--accent)">⏱️ ${item.tiempo} · Impacto: ${item.impacto}</div>
+      </div>`;
+    roadmapDiv.appendChild(div);
+  });
+
+  // Problemas
+  const probList = document.getElementById('problemsList');
+  probList.innerHTML = '';
+  if (diag.problemas && diag.problemas.length) {
+    diag.problemas.forEach(p => {
+      const chip = document.createElement('span');
+      chip.className = 'flag' + (p.prioridad === 'alta' ? '' : ' warn');
+      chip.innerHTML = `${p.titulo} <small>(${p.solucion})</small>`;
+      probList.appendChild(chip);
+    });
+  }
+
+  // JSON
+  const outputJson = {
+    negocio: diag.negocio,
+    nodos: diag.nodos,
+    raci: diag.raci,
+    roadmap: diag.roadmap,
+    problemas: diag.problemas,
+    quick_wins: diag.quick_wins,
+    flags: diag.flags
+  };
+  document.getElementById('jsonBlock').textContent = JSON.stringify(outputJson, null, 2);
+
+  // Quick wins append
+  if (diag.quick_wins && diag.quick_wins.length) {
+    const qw = document.createElement('div');
+    qw.className = 'card';
+    qw.style.marginTop = '16px';
+    qw.innerHTML = `
+      <div class="step-header">
+        <div class="step-icon">⚡</div>
+        <div><div class="step-title">Quick Wins (menos de 30 días)</div></div>
+      </div>
+      ${diag.quick_wins.map(q => `<div style="font-size:13px;padding:8px 0;border-bottom:1px solid var(--border)">→ ${q}</div>`).join('')}`;
+    document.getElementById('diagnoseSummary').parentNode.parentNode.insertBefore(qw, document.getElementById('resultSection').children[2]);
+  }
+
+  const section = document.getElementById('resultSection');
+  section.classList.add('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyJSON() {
+  const text = document.getElementById('jsonBlock').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('JSON copiado al portapapeles');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+initDots();
+updateProgress();
+</script>
+
+</body>
+</html>
