@@ -610,6 +610,8 @@
     transform: translateY(0);
   }
 
+  .hidden { display: none !important; }
+
   @media (max-width: 600px) {
     .card { padding: 24px 20px; }
     .grid-2 { grid-template-columns: 1fr; }
@@ -647,23 +649,22 @@
 
         <div class="field">
           <label>¿A qué se dedica tu negocio? <span class="hint">(descripción breve)</span></label>
-          <textarea id="f_descripcion" placeholder="Ej: Somos una empresa que vende materiales de construcción a constructoras y remodeladores. Tenemos un local y entregamos nosotros mismos." rows="3"></textarea>
+          <textarea id="f_descripcion" placeholder="Ej: Somos una tienda de repuestos de motos. Vendemos filtros, bujías, aceites y accesorios. Tenemos un local y hacemos entregas a domicilio." rows="3"></textarea>
         </div>
 
         <div class="grid-2">
           <div class="field">
             <label>Tipo de negocio</label>
-            <select id="f_tipo">
+            <select id="f_tipo" onchange="detectarTipoNegocio()">
               <option value="">Seleccioná...</option>
-              <option>Servicio profesional</option>
-              <option>Comercio / Retail</option>
-              <option>Producción / Manufactura</option>
-              <option>Tecnología / SaaS</option>
-              <option>Inmobiliaria</option>
-              <option>Educación</option>
-              <option>Salud / Bienestar</option>
-              <option>Gastronomía</option>
-              <option>Otro</option>
+              <option value="servicio">Servicio profesional (asesoría, consultorio, gimnasio, peluquería)</option>
+              <option value="comercio">Comercio / Tienda (venta de productos)</option>
+              <option value="produccion">Producción / Manufactura</option>
+              <option value="saas">Tecnología / SaaS</option>
+              <option value="inmobiliaria">Inmobiliaria</option>
+              <option value="educacion">Educación / Cursos</option>
+              <option value="gastronomia">Gastronomía</option>
+              <option value="otro">Otro</option>
             </select>
           </div>
           <div class="field">
@@ -700,7 +701,7 @@
           <select id="f_objetivo">
             <option value="">Seleccioná el más importante...</option>
             <option>Aumentar ventas y clientes</option>
-            <option>Ordenar el negocio (sacar al老板 del día a día)</option>
+            <option>Ordenar el negocio (sacar al jefe del día a día)</option>
             <option>Escalar sin contratar más gente</option>
             <option>Lanzar un producto o servicio nuevo</option>
             <option>Reducir costos y mejorar ganancia</option>
@@ -728,9 +729,9 @@
           <label>¿Por dónde llegan los clientes? <span class="hint">(marcá todos los que aplique)</span></label>
           <div class="check-group">
             <label class="check-item"><input type="checkbox" name="canal" value="Instagram/Facebook"> Instagram/Facebook</label>
-            <label class="check-item"><input type="checkbox" name="canal" value="Google/búsqueda"> Google (búsqueda)</label>
+            <label class="check-item"><input type="checkbox" name="canal" value="Google busqueda"> Google (búsqueda)</label>
             <label class="check-item"><input type="checkbox" name="canal" value="Google Ads"> Pasan publicidad en Google</label>
-            <label class="check-item"><input type="checkbox" name="canal" value="Referidos"> Clients anteriores te mandan otros</label>
+            <label class="check-item"><input type="checkbox" name="canal" value="Referidos"> Clientes anteriores te mandan otros</label>
             <label class="check-item"><input type="checkbox" name="canal" value="LinkedIn"> LinkedIn</label>
             <label class="check-item"><input type="checkbox" name="canal" value="Boca en boca"> Boca en boca / pasan la voz</label>
             <label class="check-item"><input type="checkbox" name="canal" value="Web propia"> Visitan tu web</label>
@@ -753,8 +754,8 @@
             <select id="f_crm">
               <option value="no">No, nada formal</option>
               <option value="excel">Excel o Google Sheets</option>
-              <option value="crm_basico">CRM básico (HubSpot free, etc)</option>
-              <option value="crm_avanzado">CRM pago</option>
+              <option value="crm_basico">Sistema básico (HubSpot free, etc)</option>
+              <option value="crm_avanzado">Sistema pago</option>
               <option value="whatsapp">Solo WhatsApp</option>
             </select>
           </div>
@@ -772,7 +773,7 @@
         </div>
 
         <div class="field">
-          <label>📊 ¿Cuántos leads nuevos por mes?</label>
+          <label>📊 ¿Cuántos clientes nuevos por mes?</label>
           <select id="f_leads">
             <option value="1-5">Entre 1 y 5</option>
             <option value="5-20">Entre 5 y 20</option>
@@ -781,7 +782,7 @@
             <option value="+100">Más de 100</option>
             <option value="no_se">No tengo idea</option>
           </select>
-          <span class="example">un lead = alguien que te consultó pero todavía no te pagó</span>
+          <span class="example">cliente nuevo = alguien que te consultó pero todavía no te pagó</span>
         </div>
       </div>
       <div class="nav-btns">
@@ -797,7 +798,7 @@
           <div class="step-icon">💼</div>
           <div>
             <div class="step-title">Ventas — Del interés a la venta</div>
-            <div class="step-desc">¿Qué pasa desde que alguien consulta hasta que pagas?</div>
+            <div class="step-desc">¿Qué pasa desde que alguien consulta hasta que paga?</div>
           </div>
         </div>
 
@@ -817,17 +818,17 @@
             <select id="f_proceso_venta">
               <option value="no">No, cada uno hace lo que quiere</option>
               <option value="informal">Tenemos idea pero no está escrito</option>
-              <option value="semi">Medio escrito, medio improvisation</option>
+              <option value="semi">Medio escrito, medio improvisado</option>
               <option value="si">Sí, documentado y lo cumplimos</option>
             </select>
           </div>
         </div>
 
         <div class="field">
-          <label>🔄 ¿Qué pasa cuando un lead no contesta? ¿Lo siguen?</label>
+          <label>🔄 ¿Qué pasa cuando un cliente no contesta? ¿Lo siguen?</label>
           <select id="f_seguimiento">
             <option value="no">No, si no contesta se pierde</option>
-            <option value="manual_aveces">A veces,取决于 cuándo nos acordamos</option>
+            <option value="manual_aveces">A veces, se nos ocurre</option>
             <option value="manual_siempre">Sí, siempre lo intentamos</option>
             <option value="automatico">Tenemos automate que sigue solo</option>
           </select>
@@ -841,7 +842,7 @@
               <option value="whatsapp">Por WhatsApp</option>
               <option value="email">Por email (PDF o manual)</option>
               <option value="sistema">Por un sistema/plataforma</option>
-              <option value="verbal"> Verbal / Llamada</option>
+              <option value="verbal">Verbal / Llamada</option>
             </select>
           </div>
           <div class="field">
@@ -867,7 +868,7 @@
               <option value="+10000">Más de $10.000</option>
               <option value="no_se">No tengo idea</option>
             </select>
-            <span class="example">en dollars, si es servicio u$s precio por proyecto</span>
+            <span class="example">en dólares, si es servicio u$s precio por proyecto</span>
           </div>
           <div class="field">
             <label>📈 ¿De los que consultan, cuántos terminan comprando?</label>
@@ -887,20 +888,104 @@
       </div>
     </div>
 
-    <!-- STEP 4: Operaciones -->
+    <!-- STEP 4: Operaciones / Entrega - ADAPTATIVO -->
     <div class="step" id="step-4">
       <div class="card">
         <div class="step-header">
           <div class="step-icon">⚙️</div>
           <div>
-            <div class="step-title">Operaciones — Entregar el trabajo</div>
-            <div class="step-desc">Después de que paga, ¿qué pasa hasta que entregás?</div>
+            <div class="step-title" id="step4-title">Operaciones — Entregar el trabajo</div>
+            <div class="step-desc" id="step4-desc">Después de que paga, ¿qué pasa hasta que entregás?</div>
           </div>
         </div>
 
+        <!-- PARA PRODUCTO (Tienda/Comercio/Producción) -->
+        <div id="preguntas-producto" class="hidden">
+          <div class="field">
+            <label>🛒 ¿Cómo entrega el producto al cliente?</label>
+            <div class="check-group">
+              <label class="check-item"><input type="checkbox" name="entrega" value="Se lleva del local"> Se lo lleva del local</label>
+              <label class="check-item"><input type="checkbox" name="entrega" value="Se lo mandamos a domicilio"> Se lo mandamos a domicilio</label>
+              <label class="check-item"><input type="checkbox" name="entrega" value="Pasa a buscar"> Pasa a buscar cuando está listo</label>
+              <label class="check-item"><input type="checkbox" name="entrega" value="Entrega en obra/lugar"> Vamos nosotros a entregarla/instalarla</label>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label>📦 ¿Tienen stock o piden cuando el cliente compra?</label>
+              <select id="f_stock">
+                <option value="stock">Tenemos stock propio</option>
+                <option value="pedido">Pedimos cuando el cliente compra</option>
+                <option value="mixto">Depende del producto</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>✅ ¿Dan garantía?</label>
+              <select id="f_garantia">
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+                <option value="defecto">Solo por defecto de fábrica</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>🔙 ¿El cliente puede devolver el producto?</label>
+            <select id="f_devolucion">
+              <option value="no">No</option>
+              <option value="si">Sí, sin problema</option>
+              <option value="defecto">Solo si no funciona / tiene defecto</option>
+              <option value="plazo">Sí, dentro de los primeros días</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- PARA SERVICIO -->
+        <div id="preguntas-servicio" class="hidden">
+          <div class="field">
+            <label>🏃 ¿Cómo dan el servicio?</label>
+            <div class="check-group">
+              <label class="check-item"><input type="checkbox" name="entrega" value="Cliente viene a nuestro local"> Cliente viene a nuestro local</label>
+              <label class="check-item"><input type="checkbox" name="entrega" value="Vamos donde el cliente"> Nosotros vamos donde el cliente</label>
+              <label class="check-item"><input type="checkbox" name="entrega" value="Virtual/remoto"> Virtual / remoto</label>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label>⏱️ ¿Cuánto dura el servicio?</label>
+              <select id="f_duracion">
+                <option value="una_vez">Una vez (por sesión/visita)</option>
+                <option value="mes">Por mes / suscripción</option>
+                <option value="proyecto">Por proyecto</option>
+                <option value="abierto">Abierto / sin límite</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>📅 ¿El cliente tiene que reservar?</label>
+              <select id="f_reserva">
+                <option value="si">Sí, con anticipación</option>
+                <option value="cuando_quiere">Cuando quiere, sin turno</option>
+                <option value="no_hace_falta">No hace falta</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>❓ ¿Qué pasa si el cliente no puede asistir?</label>
+            <select id="f_inasistencia">
+              <option value="pierde">Pierde la sesión / turno</option>
+              <option value="reprograma">Se reprograma sin costo</option>
+              <option value="credito">Se acredita para después</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Campos comunes -->
         <div class="field">
-          <label>📝 Describí en 2-3 oraciones qué pasa DESPUÉS de que alguien te paga</label>
-          <textarea id="f_operacion" placeholder="Ej: Le enviamos el contrato por mail, lo打印 y entrega en persona, coordinamos fecha de inicio, nuestro técnico va a hacer el trabajo, terminamos, el cliente inspecciona y firma.ok, luego facturamos y cobramos." rows="4"></textarea>
+          <label>📝 Describí en 2-3 oraciones qué pasa DESPUÉS de que alguien paga</label>
+          <textarea id="f_operacion" placeholder="Ej para producto: El cliente paga, nosotros preparamos el pedido, lo embalamos y se lo mandamos por motomensajero. Si es servicio: El cliente agenda turno, viene al local, hacemos el trabajo, y listo." rows="4"></textarea>
         </div>
 
         <div class="grid-2">
@@ -914,7 +999,7 @@
             </select>
           </div>
           <div class="field">
-            <label>📚 ¿Tienen los procesos documentados (manual, SOP)?</label>
+            <label>📚 ¿Tienen los procesos documentados (manual, paso a paso)?</label>
             <select id="f_documentado">
               <option value="no">No, todo está en la cabeza de c/u</option>
               <option value="parcial">Parcialmente, algunos</option>
@@ -925,7 +1010,7 @@
         </div>
 
         <div class="field">
-          <label>⚠️ ¿En qué suelen having problemas? <span class="hint">(marcá todos)</span></label>
+          <label>⚠️ ¿En qué suelen tener problemas? <span class="hint">(marcá todos)</span></label>
           <div class="check-group">
             <label class="check-item"><input type="checkbox" name="errores" value="Coordinación"> Coordinación entre personas</label>
             <label class="check-item"><input type="checkbox" name="errores" value="Calidad"> Calidad del resultado</label>
@@ -934,15 +1019,6 @@
             <label class="check-item"><input type="checkbox" name="errores" value="Materiales"> Materiales o insumos</label>
             <label class="check-item"><input type="checkbox" name="errores" value="Cobranza"> Cobranza / facturación</label>
           </div>
-        </div>
-
-        <div class="field">
-          <label>📅 ¿La demanda es estable todo el año?</label>
-          <select id="f_estacional">
-            <option value="no">Sí, fairly estable</option>
-            <option value="si_leve">Sí, varía un poco</option>
-            <option value="si_fuerte">No, hay picos muy marcados</option>
-          </select>
         </div>
       </div>
       <div class="nav-btns">
@@ -994,8 +1070,8 @@
             <label>🎁 ¿Tienen programa de referidos o fidelización?</label>
             <select id="f_fidelizacion">
               <option value="no">No</option>
-              <option value="informal"> Informal (sin sistema)</option>
-              <option value="si">Sí, structured</option>
+              <option value="informal">Informal (sin sistema)</option>
+              <option value="si">Sí, estructurado</option>
             </select>
           </div>
         </div>
@@ -1084,12 +1160,12 @@
             <label class="check-item"><input type="checkbox" name="tools" value="Trello"> Trello / Asana</label>
             <label class="check-item"><input type="checkbox" name="tools" value="Instagram"> Instagram</label>
             <label class="check-item"><input type="checkbox" name="tools" value="Facturación"> Sistema de facturación</label>
-            <label class="check-item"><input type="checkbox" name="tools" value="CRM"> CRM dedicado</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="CRM"> Sistema de clientes</label>
           </div>
         </div>
 
         <div class="field">
-          <label>⏰ ¿Cuántas horas por semana dedican a tareas repetitivas manuelle?</label>
+          <label>⏰ ¿Cuántas horas por semana dedican a tareas repetitivas manuales?</label>
           <select id="f_manual">
             <option value="pocas">Pocas (1-5 hs/semana)</option>
             <option value="moderado">Moderado (5-15 hs/semana)</option>
@@ -1120,14 +1196,14 @@
           <div class="step-icon">⚠️</div>
           <div>
             <div class="step-title">Puntos de dolor — Lo más importante</div>
-            <div class="step-desc">Sé honesto, esto ayuda a encontrar solutions.</div>
+            <div class="step-desc">Sé honesto, esto ayuda a encontrar soluciones.</div>
           </div>
         </div>
 
         <div class="field">
           <label>💸 ¿Dónde sentís que perdés plata? <span class="hint">(marcá todos los que apliquen)</span></label>
           <div class="check-group">
-            <label class="check-item"><input type="checkbox" name="pierde_plata" value="Leads que no cierran"> Leads que consultan pero no cierran</label>
+            <label class="check-item"><input type="checkbox" name="pierde_plata" value="Leads que no cierran"> Clientes que consultan pero no cierran</label>
             <label class="check-item"><input type="checkbox" name="pierde_plata" value="Clientes que no vuelven"> Clientes que no vuelven</label>
             <label class="check-item"><input type="checkbox" name="pierde_plata" value="Tiempo operativo"> Tiempo del dueño en tareas operativas</label>
             <label class="check-item"><input type="checkbox" name="pierde_plata" value="Errores"> Errores y retrabajos</label>
@@ -1139,12 +1215,12 @@
 
         <div class="field">
           <label>🔥 Describí en 2-3 oraciones la parte más caótica del negocio</label>
-          <textarea id="f_caotico" placeholder="Ej: Cuando entran muchos clientes a la vez, nadie sabe quién hace qué. El dueño termina haciendo todo y siempre le echa la culpa a los otros cuando algo falla. No hay quién mande." rows="3"></textarea>
+          <textarea id="f_caotico" placeholder="Ej: Cuando entran muchos clientes a la vez, nadie sabe quién hace qué. El jefe termina haciendo todo y siempre le echa la culpa a los otros cuando algo falla. No hay quién mande." rows="3"></textarea>
         </div>
 
         <div class="field">
           <label>🎯 Si pudieras resolver algo mañana, ¿qué sería?</label>
-          <textarea id="f_resolver" placeholder="Ej: Que los leads no se pierdan. Que mi equipo sepa qué hacer sin que yo tenga que estar ahí. Poder ir de vacaciones sin que todo se caiga." rows="3"></textarea>
+          <textarea id="f_resolver" placeholder="Ej: Que los clientes no se pierdan. Que mi equipo sepa qué hacer sin que yo tenga que estar ahí. Poder ir de vacaciones sin que todo se caiga." rows="3"></textarea>
         </div>
       </div>
       <div class="nav-btns">
@@ -1186,7 +1262,7 @@
     <!-- Mapa de Nodos -->
     <div class="card">
       <div class="step-header">
-        <div class="step-icon">🗺���</div>
+        <div class="step-icon">🗺️</div>
         <div><div class="step-title">Mapa de Procesos</div></div>
       </div>
       <div class="nodes-grid" id="nodesGrid"></div>
@@ -1239,14 +1315,14 @@
       <div id="problemsList"></div>
     </div>
 
-    <!-- JSON -->
+    <!-- Botón descargar -->
     <div class="card">
       <div class="step-header">
-        <div class="step-icon">📄</div>
-        <div><div class="step-title">JSON (para guardar)</div></div>
+        <div class="step-icon">💾</div>
+        <div><div class="step-title">Descargar Diagnóstico</div></div>
       </div>
-      <div class="json-block" id="jsonBlock"></div>
-      <button class="btn btn-secondary" onclick="copyJSON()" style="width:100%;margin-top:12px">📋 Copiar JSON</button>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Guardá el diagnóstico en JSON para usar después.</p>
+      <button class="btn btn-primary" onclick="downloadJSON()" style="width:100%">📥 Descargar JSON</button>
     </div>
   </div>
 
@@ -1262,6 +1338,32 @@ const GROQ_API_KEY = "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";
 let currentStep = 1;
 const totalSteps = 8;
 let diagnosisData = null;
+let tipoNegocio = 'servicio';
+
+function detectarTipoNegocio() {
+  const select = document.getElementById('f_tipo');
+  const tipo = select.value;
+  
+  const esProducto = ['comercio', 'produccion'].includes(tipo);
+  const title = document.getElementById('step4-title');
+  const desc = document.getElementById('step4-desc');
+  const prodDiv = document.getElementById('preguntas-producto');
+  const servDiv = document.getElementById('preguntas-servicio');
+  
+  if (esProducto) {
+    tipoNegocio = 'producto';
+    title.textContent = 'Operaciones — Entregar el producto';
+    desc.textContent = 'Después de que paga, ¿qué pasa hasta que entregás?';
+    prodDiv.classList.remove('hidden');
+    servDiv.classList.add('hidden');
+  } else {
+    tipoNegocio = 'servicio';
+    title.textContent = 'Operaciones — Dar el servicio';
+    desc.textContent = 'Después de que paga, ¿qué pasa hasta que entregás?';
+    prodDiv.classList.add('hidden');
+    servDiv.classList.remove('hidden');
+  }
+}
 
 function initDots() {
   const container = document.getElementById('stepDots');
@@ -1331,11 +1433,18 @@ function collectData() {
       conversion: document.getElementById('f_conversion').value,
     },
     operaciones: {
+      tipoNegocio: tipoNegocio,
+      entrega: getChecked('entrega'),
       descripcion: document.getElementById('f_operacion').value,
       ejecutor: document.getElementById('f_ejecutor').value,
       documentado: document.getElementById('f_documentado').value,
       errores: getChecked('errores'),
-      estacional: document.getElementById('f_estacional').value,
+      stock: document.getElementById('f_stock')?.value || null,
+      garantia: document.getElementById('f_garantia')?.value || null,
+      devolucion: document.getElementById('f_devolucion')?.value || null,
+      duracion: document.getElementById('f_duracion')?.value || null,
+      reserva: document.getElementById('f_reserva')?.value || null,
+      inasistencia: document.getElementById('f_inasistencia')?.value || null,
     },
     postventa: {
       seguimiento: document.getElementById('f_postventa').value,
@@ -1373,17 +1482,20 @@ async function generateDiagnosis() {
 DATOS DEL NEGOCIO:
 ${JSON.stringify(data, null, 2)}
 
+Tipo de negocio: ${tipoNegocio === 'producto' ? 'PRODUCTO (tienda, comercio, producción)' : 'SERVICIO (profesional, gimnasio, consultorio)'}
+
 Respondé ÚNICAMENTE con JSON válido (sin texto antes o después, sin markdown):
 {
   "negocio": {
     "tipo": "string",
+    "tipo_rama": "${tipoNegocio}",
     "equipo": number,
     "objetivo_12m": "string"
   },
-  "resumen_ejecutivo": "3-4 oraciones directas sobre el estado actual del negocio. Qué funciona, qué no, y qué priority.",
+  "resumen_ejecutivo": "3-4 oraciones directas sobre el estado actual del negocio. Qué funciona, qué no, y qué prioridad.",
   "nodos": [
     {
-      "nombre": "string (Marketing, Ventas, Operaciones, Postventa, Admin, Sistemas)",
+      "nombre": "string (Marketing, Ventas, Entrega, Postventa, Admin, Sistemas)",
       "emoji": "string",
       "estado": "ok|riesgo|critico",
       "subprocesos": ["string"],
@@ -1417,7 +1529,7 @@ Respondé ÚNICAMENTE con JSON válido (sin texto antes o después, sin markdown
 }
 
 Reglas:
-- nodos:incluir Marketing, Ventas, Operaciones, Postventa, Administración, Sistemas
+- nodos incluir: Marketing, Ventas, Entrega/Servicio, Postventa, Administración, Sistemas
 - cada nodo debe tener "pasos" detallados (el flujo real)
 - problemas deben ser concretos y accionables
 - roadmap priorizado por impacto
@@ -1455,10 +1567,8 @@ function renderResult(diag, rawData) {
   document.getElementById('loadingState').style.display = 'none';
   document.getElementById('wizard').style.display = 'none';
 
-  // Resumen Ejecutivo
   document.getElementById('diagnoseSummary').textContent = diag.resumen_ejecutivo;
 
-  // Nodos
   const nodesGrid = document.getElementById('nodesGrid');
   nodesGrid.innerHTML = '';
   diag.nodos.forEach(node => {
@@ -1477,7 +1587,6 @@ function renderResult(diag, rawData) {
     nodesGrid.appendChild(card);
   });
 
-  // Flujo Detallado
   const flujoDiv = document.getElementById('flujoDetallado');
   flujoDiv.innerHTML = '';
   diag.nodos.forEach(node => {
@@ -1493,7 +1602,6 @@ function renderResult(diag, rawData) {
     }
   });
 
-  // RACI
   const raciBody = document.getElementById('raciBody');
   raciBody.innerHTML = '';
   (diag.raci || []).forEach(r => {
@@ -1508,7 +1616,6 @@ function renderResult(diag, rawData) {
     raciBody.appendChild(tr);
   });
 
-  // Roadmap
   const roadmapDiv = document.getElementById('roadmap');
   roadmapDiv.innerHTML = '';
   (diag.roadmap || []).forEach((item, i) => {
@@ -1524,7 +1631,6 @@ function renderResult(diag, rawData) {
     roadmapDiv.appendChild(div);
   });
 
-  // Problemas
   const probList = document.getElementById('problemsList');
   probList.innerHTML = '';
   if (diag.problemas && diag.problemas.length) {
@@ -1536,42 +1642,39 @@ function renderResult(diag, rawData) {
     });
   }
 
-  // JSON
-  const outputJson = {
+  window.diagnosisFinal = {
     negocio: diag.negocio,
     nodos: diag.nodos,
     raci: diag.raci,
     roadmap: diag.roadmap,
     problemas: diag.problemas,
     quick_wins: diag.quick_wins,
-    flags: diag.flags
+    flags: diag.flags,
+    datos_originales: rawData
   };
-  document.getElementById('jsonBlock').textContent = JSON.stringify(outputJson, null, 2);
-
-  // Quick wins append
-  if (diag.quick_wins && diag.quick_wins.length) {
-    const qw = document.createElement('div');
-    qw.className = 'card';
-    qw.style.marginTop = '16px';
-    qw.innerHTML = `
-      <div class="step-header">
-        <div class="step-icon">⚡</div>
-        <div><div class="step-title">Quick Wins (menos de 30 días)</div></div>
-      </div>
-      ${diag.quick_wins.map(q => `<div style="font-size:13px;padding:8px 0;border-bottom:1px solid var(--border)">→ ${q}</div>`).join('')}`;
-    document.getElementById('diagnoseSummary').parentNode.parentNode.insertBefore(qw, document.getElementById('resultSection').children[2]);
-  }
 
   const section = document.getElementById('resultSection');
   section.classList.add('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function copyJSON() {
-  const text = document.getElementById('jsonBlock').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    showToast('JSON copiado al portapapeles');
-  });
+function downloadJSON() {
+  if (!window.diagnosisFinal) return;
+  
+  const json = JSON.stringify(window.diagnosisFinal, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  
+  const fecha = new Date().toISOString().split('T')[0];
+  const nombre = window.diagnosisFinal.negocio?.tipo || 'negocio';
+  a.download = `diagnostico-${nombre}-${fecha}.json`;
+  
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  showToast('📥 Diagnóstico descargado');
 }
 
 function showToast(msg) {
